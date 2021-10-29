@@ -1,0 +1,13 @@
+div{
+  margin-left: 25%;
+  margin-top: 3%;
+  display: inline-flex;
+}
+
+.button-undo{
+  height: 40px;
+  width: 80px;
+  margin-left: 100px;
+  margin-top: 350px;
+  cursor: pointer;
+}

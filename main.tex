@@ -1,0 +1,162 @@
+\documentclass[runningheads,a4paper,11pt]{report}
+
+\usepackage{algorithmic}
+\usepackage{algorithm} 
+\usepackage{array}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{caption}
+\usepackage{comment} 
+\usepackage{epsfig} 
+\usepackage{fancyhdr}
+\usepackage[T1]{fontenc}
+\usepackage{geometry} 
+\usepackage{graphicx}
+\usepackage[colorlinks]{hyperref} 
+\usepackage[latin1]{inputenc}
+\usepackage{multicol}
+\usepackage{multirow} 
+\usepackage{rotating}
+\usepackage{setspace}
+\usepackage{subfigure}
+\usepackage{url}
+\usepackage{verbatim}
+\usepackage{xcolor}
+
+\geometry{a4paper,top=3cm,left=2cm,right=2cm,bottom=3cm}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{Project Popeye}
+\fancyfoot[RE,LO]{MIRPR 2021-2022}
+\fancyfoot[LE,RO]{\thepage}
+
+\renewcommand{\headrulewidth}{2pt}
+\renewcommand{\footrulewidth}{1pt}
+\renewcommand{\headrule}{\hbox to\headwidth{%
+  \color{lime}\leaders\hrule height \headrulewidth\hfill}}
+\renewcommand{\footrule}{\hbox to\headwidth{%
+  \color{lime}\leaders\hrule height \footrulewidth\hfill}}
+
+\hypersetup{
+pdftitle={artTitle},
+pdfauthor={name},
+pdfkeywords={pdf, latex, tex, ps2pdf, dvipdfm, pdflatex},
+bookmarksnumbered,
+pdfstartview={FitH},
+urlcolor=cyan,
+colorlinks=true,
+linkcolor=red,
+citecolor=green,
+}
+
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+
+\linespread{1}
+
+\makeindex
+
+
+\begin{document}
+
+\begin{titlepage}
+\sloppy
+
+\begin{center}
+BABE\c S BOLYAI UNIVERSITY, CLUJ NAPOCA, ROM\^ ANIA
+
+FACULTY OF MATHEMATICS AND COMPUTER SCIENCE
+
+\vspace{6cm}
+
+\Huge \textbf{Trying to master the game of chess with help of neural networks}
+
+\vspace{1cm}
+
+\normalsize -- MIRPR report --
+
+\end{center}
+
+
+\vspace{5cm}
+
+\begin{flushright}
+\Large{\textbf{Team members}}\\
+Tudor Petru Cheregi, tudor.cheregi@stud.ubbcluj.ro\\
+Victor Mihai Macinic, victor.macinic@stud.ubbcluj.ro
+\end{flushright}
+
+\vspace{4cm}
+
+\begin{center}
+2021-2022
+\end{center}
+
+\end{titlepage}
+
+\pagenumbering{gobble}
+
+\begin{abstract}
+	    Throughout chess engines history, there have been proposed lots of different strategies in order to come up with the best algorithm possible. In comparison with very complex and general models that are capable of adapting to various environments (games), our approach is to create a neural network that is not capable of playing chess by itself, but rather is very good at evaluating random chess positions.
+	    Since there exist known metrics for evaluating a given position/configuration of pieces
+	    we can create our model on a fully supervised manner.
+		The data needed to train the model is comprised of random chess positions from different games and different ELO ranges which can be found in the Big Chess DataBase, and their evaluation was obtained with the help of Stockfish (one of the best chess engines available for free).
+\end{abstract}
+
+
+\tableofcontents
+
+\newpage
+
+\newpage
+
+\setstretch{1.5}
+
+
+
+\newpage
+
+\pagenumbering{arabic}
+
+
+ 
+
+
+\chapter{Introduction}
+\label{chapter:introduction}
+
+
+Chess is an abstract strategy game and involves no hidden information. It is played on a square chessboard with 64 squares arranged in an eight-by-eight grid. At the start, each player (one controlling the white pieces, the other controlling the black pieces) controls sixteen pieces: one king, one queen, two rooks, two knights, two bishops, and eight pawns. The object of the game is to checkmate the opponent's king, whereby the king is under immediate attack (in "check") and there is no way for it to escape. There are also several ways a game can end in a draw.
+
+One of the goals of early computer scientists was to create a chess-playing machine. In 1997, Deep Blue became the first computer to beat the reigning World Champion in a match when it defeated Garry Kasparov. Though not flawless, today's chess engines are significantly stronger than even the best human players, and have deeply influenced the development of chess theory.
+
+In comparison with Deep Blue's strategy which was comprised of several heuristic methods and a minimax tree search based algorithm, our approach is a little bit closer to what modern engines (Stockfish NNUE, Alpha-Zero) make us of: neural networks.
+
+
+
+\chapter{Scientific Problem}
+\label{section:scientificProblem}
+
+
+As we have mentioned before the game of chess is quite complex both in its rules and in its strategy and it is a pretty difficult task to take on with a conventional algorithm that simply uses a set of defined rules according to the current position. The reason of that is primarily due to our limited knowledge of how chess should be played. In essence the engine's level would be gaped to the potential of that set of rules. Thus, if we want to overcome this threshold and truly to achieve a breakthrough, deep learning would be our best chance.
+Give a description of the problem.
+
+
+
+
+\chapter{State of the art}
+\label{chapter:stateOfArt}
+
+
+In 2017, a revolutionary strategy was introduced by people from DeepMind who manage to create an algorithm that is able to generally play and adapt to any sort of game, given the necessary set of rules. Their approach was completely based on a deep reinforcement learning model.
+
+Differences between DeepMind's approach and ours:
+\begin{itemize}
+	 \item Instead of using a reinforcement learning model, ours is based on a fully supervised method.
+	 \item Our model is not able to cope with any different environment besides the game of chess since it was specifically trained for this task. 
+\end{itemize}
+
+\end{document}
