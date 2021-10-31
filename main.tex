@@ -159,4 +159,63 @@ Differences between DeepMind's approach and ours:
 	 \item Our model is not able to cope with any different environment besides the game of chess since it was specifically trained for this task. 
 \end{itemize}
 
+\chapter{Approach}
+
+\begin{algorithm}
+	\caption{Training}
+	\label{BestMove}
+		\begin{algorithmic}
+        
+        \STATE \textbf{INPUT}
+        \STATE B - data batches
+        \STATE X - input data
+        \STATE Y - labels for input data
+        \STATE f - the network with parameters $\theta$
+        \STATE \textbf{BEGIN}
+        \FOR{i=1 TO numberOfEpochs}
+            \FOR{j = 1 TO numberOfBatches}
+                \STATE b $\leftarrow$ B[j];
+                \STATE XBatch $\leftarrow$ all X from batch b;
+                \STATE YBatch $\leftarrow$ all Y from batch b;
+                \STATE predictions $\leftarrow$ f(XBatch, $\theta$);
+                \STATE loss $\leftarrow$ MSE(predictions, YBatch);
+                \STATE update $\theta$ with the obtained loss using an optimer, e.g. Adam
+            \ENDFOR
+        \ENDFOR
+        \RETURN $\theta$
+  		\STATE \textbf{END}
+\end{algorithmic}
+\end{algorithm}
+
+
+\begin{algorithm}
+	\caption{Choose best move}
+	\label{BestMove}
+		\begin{algorithmic}
+        
+        \STATE \textbf{INPUT}
+        \STATE  network: The neural network responsible for evaluating the                       position
+        \STATE currentPosition: the current position represented as a FEN string
+        
+        \STATE \textbf{OUTPUT}
+        \STATE  bestFen: The FEN representation of the next best move 
+        
+		\STATE \textbf{BEGIN}
+  		\STATE nextMoves $\leftarrow$ getAllNextMoves(currentPosition);
+  		\STATE bestFen $\leftarrow$ \textbf{NULL};
+  		\STATE bestEval $\leftarrow$ \textbf{NULL};
+  		\FOR{i=1 TO nextMoves.size()}
+  		    \IF{bestFen = \textbf{NULL}}
+  		        \STATE bestFen $\leftarrow$ nextMoves[i];
+  		        \STATE bestEval $\leftarrow$ network.predict(bestFen);
+  		    \ELSIF{network.predict(nextMoves[i]) > bestEval}
+  		        \STATE bestFen $\leftarrow$ nextMoves[i];
+  		        \STATE bestEval $\leftarrow$ network.predict(bestFen);
+  		    \ENDIF
+  		\ENDFOR
+  		\RETURN bestFen;
+  		\STATE \textbf{END}
+\end{algorithmic}
+\end{algorithm}
+
 \end{document}
