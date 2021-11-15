@@ -161,6 +161,18 @@ Differences between DeepMind's approach and ours:
 
 \chapter{Approach}
 
+
+    As we have mentioned before, our goal is to create a decent evaluator for a given chess position rather than a model that is actually able to make a move. To do so, we firstly gathered some data which is comprised of several chess positions from Magnus Carlsen's (current world champion) live games which we encoded into FEN string representations that were then transposed into a tensor of dimensions 8x8x1.
+    \\*At first we created 3 different models to asses their performance. 
+    \\* \textbf{Model 1}
+    \\* A network with fully connected layers.
+    \\* \textbf{Model 2}
+    \\* A network with convolutional layers to which have been added some fully connected layers in order to provide additional computation in hope of achieving better performance.
+    \\* \textbf{Model 3}
+    \\* A RESNet(152 v2 architecture) to which we concatenated again some fully connected layers following the same reasoning as we did in case of the second model.
+    \\* For all the models mentioned above the training algorithm can be found in \textbf{Algorithm 1}.
+
+
 \begin{algorithm}
 	\caption{Training}
 	\label{BestMove}
@@ -217,5 +229,6 @@ Differences between DeepMind's approach and ours:
   		\STATE \textbf{END}
 \end{algorithmic}
 \end{algorithm}
+
 
 \end{document}
