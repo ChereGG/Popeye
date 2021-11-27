@@ -1,7 +1,7 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {NgxChessBoardComponent, NgxChessBoardService} from 'ngx-chess-board';
-import {NgxChessBoardView} from 'ngx-chess-board';
-import {KeyedRead} from "@angular/compiler";
+import {NgxChessBoardComponent, NgxChessBoardView} from 'ngx-chess-board';
+import {BoardService} from "../../services/board.service";
+import {HttpClient} from "@angular/common/http";
 
 @Component({
   selector: 'app-chess-board',
@@ -9,14 +9,14 @@ import {KeyedRead} from "@angular/compiler";
   styleUrls: ['./chess-board.component.css']
 })
 export class ChessBoardComponent implements OnInit {
-
+  private i : number =0;
   @ViewChild(NgxChessBoardComponent) board: NgxChessBoardView;
 
-  constructor() {
+  public constructor(private boardService: BoardService){
 
   }
-
   ngOnInit(): void {
+
   }
 
   ngAfterViewInit(): void {
@@ -24,5 +24,15 @@ export class ChessBoardComponent implements OnInit {
 
   undo(): void {
     this.board.undo();
+  }
+
+  nextMove(): void{
+    if(this.i%2 == 0) {
+      const fen = this.board.getFEN();
+      this.boardService.getNextMove(fen).subscribe(response => {
+        this.board.move(response['move']);
+      });
+    }
+    this.i++;
   }
 }
