@@ -1,6 +1,5 @@
 import tensorflow as tf
 import numpy as np
-from preprocessing import fen_preprocessing as fp
 
 
 def fen_to_matrix(fen):
@@ -38,41 +37,36 @@ def getTrainData(inputFilePath):
 def get_model():
     model = tf.keras.models.Sequential([
         tf.keras.layers.Input(shape=(8, 8, 1)),
-        tf.keras.layers.Conv2D(filters=8, kernel_size=3, padding='same', kernel_initializer='he_uniform',
-                               activation='relu'),
-        tf.keras.layers.Conv2D(filters=16, kernel_size=3, padding='same', kernel_initializer='he_uniform',
-                               activation='relu'),
-        tf.keras.layers.Conv2D(filters=32, kernel_size=3, padding='same', kernel_initializer='he_uniform',
-                               activation='relu'),
-        tf.keras.layers.Conv2D(filters=64, kernel_size=3, padding='same', kernel_initializer='he_uniform',
-                               activation='relu'),
-        tf.keras.layers.Conv2D(filters=128, kernel_size=3, padding='same', kernel_initializer='he_uniform',
-                               activation='relu'),
-        tf.keras.layers.Conv2D(filters=256, kernel_size=3, padding='same', kernel_initializer='he_uniform',
-                               activation='relu'),
         tf.keras.layers.Flatten(),
-        tf.keras.layers.Dense(1024, activation='relu'),
-        tf.keras.layers.Dense(2048, activation='relu'),
-        tf.keras.layers.Dense(4096, activation='relu'),
+	tf.keras.layers.Dense(4096, activation='relu'),
+	tf.keras.layers.Dense(4096, activation='relu'),
+	tf.keras.layers.Dense(4096, activation='relu'),
+	tf.keras.layers.Dense(2048, activation='relu'),
+	tf.keras.layers.Dense(2048, activation='relu'),
+	tf.keras.layers.Dense(2048, activation='relu'),
+	tf.keras.layers.Dense(1024, activation='relu'),
+	tf.keras.layers.Dense(1024, activation='relu'),
+	tf.keras.layers.Dense(1024, activation='relu'),
+	tf.keras.layers.Dense(512, activation='relu'),
+	tf.keras.layers.Dense(512, activation='relu'),
+	tf.keras.layers.Dense(512, activation='relu'),
+        tf.keras.layers.Dense(256, activation='relu'),
+        tf.keras.layers.Dense(256, activation='relu'),
+        tf.keras.layers.Dense(256, activation='relu'),
         tf.keras.layers.Dense(1, activation='linear')
     ])
     model.compile(optimizer='adam', loss='mse')
     return model
 
 
-def get_loaded_model():
-    model = tf.keras.models.load_model('models/conv_model')
-    return model
-
 def main():
     model = get_model()
-    X_train, Y_train = getTrainData("gdrive/MyDrive/trainData")
+    X_train, Y_train = getTrainData("trainData")
     X_train = np.expand_dims(X_train, axis=3)
-    cb = [tf.keras.callbacks.ModelCheckpoint('gdrive/MyDrive/models', save_best_only=True),
-          tf.keras.callbacks.TensorBoard(log_dir='conv_model')]
+    cb = [tf.keras.callbacks.ModelCheckpoint('dense_model', save_best_only=True),
+          tf.keras.callbacks.TensorBoard(log_dir='dense_model_logs')]
     while True:
         model.fit(X_train, Y_train, validation_split=0.2, epochs=200, callbacks=cb)
-
 
 if __name__ == '__main__':
     main()

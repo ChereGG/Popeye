@@ -5,14 +5,15 @@ from rest_framework.decorators import api_view
 from preprocessing import fen_preprocessing as fp
 from models import conv_model as cm
 import chess
+import tensorflow as tf
 
+model = cm.get_loaded_model()
 
 @api_view(['POST'])
 def next_move(request):
     if request.method == 'POST':
         fen = request.data['fen']
         print(fen)
-        model = cm.get_model()
         board = chess.Board(fen=fen)
         next_moves = board.legal_moves
         max_eval, best_move = None, None

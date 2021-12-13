@@ -16,7 +16,6 @@ logs
 Pipfile
 # dependencies
 /node_modules
-models/conv_model
 .idea
 # profiling files
 chrome-profiler-events*.json
@@ -52,6 +51,3 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
-
-models/dense_model/
-models/dense_model_logs/
