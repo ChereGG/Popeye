@@ -3,7 +3,6 @@ import chess.engine
 import chess.pgn
 
 
-
 def fen_to_matrix(fen):
     piece_values = {"P": 1, "R": 5, "N": 3, "B": 3, "K": 100, "Q": 9, "p": -1, "r": -5, "n": -3, "b": -3, "k": -100,
                     "q": -9}
@@ -22,6 +21,31 @@ def fen_to_matrix(fen):
     return matrix
 
 
+def save_train_data(fen_dict, filePath):
+    with open(filePath, 'w') as file:
+        for fen in fen_dict:
+            file.write(str(fen) + ":" + str(fen_dict[fen]) + "\n")
+
+
+def create_labels(pgn_file):
+    pgn = open(pgn_file)
+    fen_dict = dict()
+    engine = chess.engine.SimpleEngine.popen_uci("stockfish/stockfish.exe")
+    i=1
+    while True:
+        game = chess.pgn.read_game(pgn)
+        if game is None:
+            break
+        board = game.board()
+        for move in game.mainline_moves():
+            board.push(move)
+            info = engine.analyse(board, chess.engine.Limit(depth=15))
+            fen_dict[board.fen()] = info['score'].white()
+        print("Game: "+str(i)+" ended!")
+    engine.quit()
+    return fen_dict
+
+
 def main():
-    fen_dict = create_labels("test.pgn")
+    fen_dict = create_labels("Carlsen.pgn")
     save_train_data(fen_dict, "trainData")

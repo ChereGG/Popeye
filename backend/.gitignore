@@ -16,7 +16,6 @@ logs
 Pipfile
 # dependencies
 /node_modules
-models/conv_model
 .idea
 # profiling files
 chrome-profiler-events*.json
