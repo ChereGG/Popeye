@@ -1,9 +1,8 @@
 from django.http import JsonResponse
-from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import api_view
 from preprocessing import fen_preprocessing as fp
-from models import conv_model as cm
+from clusterFiles import conv_model as cm
 import chess
 
 model = cm.get_loaded_model()

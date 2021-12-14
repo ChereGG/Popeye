@@ -52,3 +52,6 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+
+models/dense_model/
+models/dense_model_logs/

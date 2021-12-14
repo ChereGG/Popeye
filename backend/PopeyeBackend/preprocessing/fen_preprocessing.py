@@ -20,6 +20,57 @@ def fen_to_matrix(fen):
                 contor += int(potential_piece)
     return matrix
 
+def fen_to_sparse_matrix6(fen):
+    piece_map={
+        "P":[[0 for _ in range(8)] for _ in range(8)],
+        "R":[[0 for _ in range(8)] for _ in range(8)],
+        "N":[[0 for _ in range(8)] for _ in range(8)],
+        "B":[[0 for _ in range(8)] for _ in range(8)],
+        "K":[[0 for _ in range(8)] for _ in range(8)],
+        "Q":[[0 for _ in range(8)] for _ in range(8)],
+    }
+    records = fen.split()
+    board = records[0]
+    position_rows = board.split("/")
+    contor = 0
+    for position_row in position_rows:
+        for potential_piece in position_row:
+            if potential_piece.isalpha():
+                if potential_piece.isupper():
+                    piece_map[potential_piece][int(contor/8)][contor%8] = 1
+                else:
+                    piece_map[potential_piece.upper()][int(contor/8)][contor%8] = -1
+                contor += 1
+            else:
+                contor += int(potential_piece)
+    return [piece_map["P"],piece_map["R"],piece_map["N"],
+            piece_map["B"],piece_map["K"],piece_map["Q"]]
+
+
+def save_train_data(fen_dict, filePath):
+    with open(filePath, 'w') as file:
+        for fen in fen_dict:
+            file.write(str(fen) + ":" + str(fen_dict[fen]) + "\n")
+
+
+def create_labels(pgn_file):
+    pgn = open(pgn_file)
+    fen_dict = dict()
+    engine = chess.engine.SimpleEngine.popen_uci("stockfish/stockfish.exe")
+    i=1
+    while True:
+        game = chess.pgn.read_game(pgn)
+        if game is None:
+            break
+        board = game.board()
+        for move in game.mainline_moves():
+            board.push(move)
+            info = engine.analyse(board, chess.engine.Limit(depth=15))
+            fen_dict[board.fen()] = info['score'].white()
+        print("Game: "+str(i)+" ended!")
+    engine.quit()
+    return fen_dict
+
 
 def save_train_data(fen_dict, filePath):
     with open(filePath, 'w') as file:
