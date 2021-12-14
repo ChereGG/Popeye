@@ -72,31 +72,6 @@ def create_labels(pgn_file):
     return fen_dict
 
 
-def save_train_data(fen_dict, filePath):
-    with open(filePath, 'w') as file:
-        for fen in fen_dict:
-            file.write(str(fen) + ":" + str(fen_dict[fen]) + "\n")
-
-
-def create_labels(pgn_file):
-    pgn = open(pgn_file)
-    fen_dict = dict()
-    engine = chess.engine.SimpleEngine.popen_uci("stockfish/stockfish.exe")
-    i=1
-    while True:
-        game = chess.pgn.read_game(pgn)
-        if game is None:
-            break
-        board = game.board()
-        for move in game.mainline_moves():
-            board.push(move)
-            info = engine.analyse(board, chess.engine.Limit(depth=15))
-            fen_dict[board.fen()] = info['score'].white()
-        print("Game: "+str(i)+" ended!")
-    engine.quit()
-    return fen_dict
-
-
 def main():
     fen_dict = create_labels("Carlsen.pgn")
     save_train_data(fen_dict, "trainData")
