@@ -94,6 +94,7 @@ def create_labels(pgn_folder):
                 print("Saving...")
                 save_train_data(fen_dict, '../trainData')
                 save_checkpoint(idx, i)
+                fen_dict = dict()
             i += 1
         engine.quit()
         pgn.close()
