@@ -78,12 +78,12 @@ def create_labels(pgn_folder):
         fen_dict = dict()
         i = 1
         while True:
-            if idx == idxGame and i <= idxPgn:
-                i += 1
-                continue
             game = chess.pgn.read_game(pgn)
             if game is None:
                 break
+            if idx == idxGame and i <= idxPgn:
+                i += 1
+                continue
             board = game.board()
             for move in game.mainline_moves():
                 board.push(move)
@@ -94,7 +94,7 @@ def create_labels(pgn_folder):
                 print("Saving...")
                 save_train_data(fen_dict, '../trainData')
                 save_checkpoint(idx, i)
-                fen_dict = dict()
+                fen_dict.clear()
             i += 1
         engine.quit()
         pgn.close()
