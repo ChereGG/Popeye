@@ -11,7 +11,7 @@
 *.ipynb*
 *.pgn
 trainData
-stockfish
+games
 logs
 Pipfile
 # dependencies
