@@ -1,6 +1,7 @@
 import chess
 import chess.engine
 import chess.pgn
+import os
 
 
 def fen_to_matrix(fen):
@@ -49,43 +50,58 @@ def fen_to_sparse_matrix6(fen):
 
 
 def save_train_data(fen_dict, filePath):
-    with open(filePath, 'w') as file:
+    with open(filePath, 'a') as file:
         for fen in fen_dict:
             file.write(str(fen) + ":" + str(fen_dict[fen]) + "\n")
 
 
-def save_train_data(fen_dict, filePath):
-    with open(filePath, 'w') as file:
-        for fen in fen_dict:
-            file.write(str(fen) + ":" + str(fen_dict[fen]) + "\n")
+def save_checkpoint(idxPgn, idxGame):
+    with open("../games/checkpoint.txt", "w") as file:
+        file.write(str(idxPgn) + ":" + str(idxGame))
 
 
-def create_labels(pgn_file):
-    pgn = open(pgn_file)
-    fen_dict = dict()
+def readCheckpoint():
+    with open("../games/checkpoint.txt", "r") as file:
+        idxGame, idxCheckpont = file.read().strip().split(":")
+    return int(idxGame), int(idxCheckpont)
+
+
+def create_labels(pgn_folder):
+    idxGame, idxPgn = readCheckpoint()
+
     engine = chess.engine.SimpleEngine.popen_uci("../../stockfish/stockfish.exe")
-    i = 1
-    while True:
-        game = chess.pgn.read_game(pgn)
-        if game is None:
-            break
-        board = game.board()
-        for move in game.mainline_moves():
-            board.push(move)
-            info = engine.analyse(board, chess.engine.Limit(depth=15))
-            fen_dict[board.fen()] = info['score'].white()
-        print("Game: " + str(i) + " ended!")
-        i += 1
-        if i % 10 == 0:
-            print("Saving...")
-            save_train_data(fen_dict, '../trainData')
-    engine.quit()
-    pgn.close()
-    return fen_dict
+    for idx, pgn_file in enumerate(os.listdir(pgn_folder)):
+        if ".txt" in pgn_file or idx < idxGame:
+            continue
+        pgn_file = pgn_folder + "/" + pgn_file
+        pgn = open(pgn_file)
+        fen_dict = dict()
+        i = 1
+        while True:
+            if idx == idxGame and i <= idxPgn:
+                i += 1
+                continue
+            game = chess.pgn.read_game(pgn)
+            if game is None:
+                break
+            board = game.board()
+            for move in game.mainline_moves():
+                board.push(move)
+                info = engine.analyse(board, chess.engine.Limit(depth=15))
+                fen_dict[board.fen()] = info['score'].white()
+            print("Game: " + str(i) + " from " + pgn_file.split("/")[-1] + " ended!")
+            if i % 10 == 0:
+                print("Saving...")
+                save_train_data(fen_dict, '../trainData')
+                save_checkpoint(idx, i)
+                fen_dict = dict()
+            i += 1
+        engine.quit()
+        pgn.close()
 
 
 def main():
-    fen_dict = create_labels('../Carlsen.pgn')
+    create_labels("../games/")
 
 
 if __name__ == '__main__':
