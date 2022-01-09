@@ -20,14 +20,15 @@ def fen_to_matrix(fen):
                 contor += int(potential_piece)
     return matrix
 
+
 def fen_to_sparse_matrix6(fen):
-    piece_map={
-        "P":[[0 for _ in range(8)] for _ in range(8)],
-        "R":[[0 for _ in range(8)] for _ in range(8)],
-        "N":[[0 for _ in range(8)] for _ in range(8)],
-        "B":[[0 for _ in range(8)] for _ in range(8)],
-        "K":[[0 for _ in range(8)] for _ in range(8)],
-        "Q":[[0 for _ in range(8)] for _ in range(8)],
+    piece_map = {
+        "P": [[0 for _ in range(8)] for _ in range(8)],
+        "R": [[0 for _ in range(8)] for _ in range(8)],
+        "N": [[0 for _ in range(8)] for _ in range(8)],
+        "B": [[0 for _ in range(8)] for _ in range(8)],
+        "K": [[0 for _ in range(8)] for _ in range(8)],
+        "Q": [[0 for _ in range(8)] for _ in range(8)],
     }
     records = fen.split()
     board = records[0]
@@ -37,14 +38,20 @@ def fen_to_sparse_matrix6(fen):
         for potential_piece in position_row:
             if potential_piece.isalpha():
                 if potential_piece.isupper():
-                    piece_map[potential_piece][int(contor/8)][contor%8] = 1
+                    piece_map[potential_piece][int(contor / 8)][contor % 8] = 1
                 else:
-                    piece_map[potential_piece.upper()][int(contor/8)][contor%8] = -1
+                    piece_map[potential_piece.upper()][int(contor / 8)][contor % 8] = -1
                 contor += 1
             else:
                 contor += int(potential_piece)
-    return [piece_map["P"],piece_map["R"],piece_map["N"],
-            piece_map["B"],piece_map["K"],piece_map["Q"]]
+    return [piece_map["P"], piece_map["R"], piece_map["N"],
+            piece_map["B"], piece_map["K"], piece_map["Q"]]
+
+
+def save_train_data(fen_dict, filePath):
+    with open(filePath, 'w') as file:
+        for fen in fen_dict:
+            file.write(str(fen) + ":" + str(fen_dict[fen]) + "\n")
 
 
 def save_train_data(fen_dict, filePath):
@@ -56,8 +63,8 @@ def save_train_data(fen_dict, filePath):
 def create_labels(pgn_file):
     pgn = open(pgn_file)
     fen_dict = dict()
-    engine = chess.engine.SimpleEngine.popen_uci("stockfish/stockfish.exe")
-    i=1
+    engine = chess.engine.SimpleEngine.popen_uci("../../stockfish/stockfish.exe")
+    i = 1
     while True:
         game = chess.pgn.read_game(pgn)
         if game is None:
@@ -67,11 +74,19 @@ def create_labels(pgn_file):
             board.push(move)
             info = engine.analyse(board, chess.engine.Limit(depth=15))
             fen_dict[board.fen()] = info['score'].white()
-        print("Game: "+str(i)+" ended!")
+        print("Game: " + str(i) + " ended!")
+        i += 1
+        if i % 10 == 0:
+            print("Saving...")
+            save_train_data(fen_dict, '../trainData')
     engine.quit()
+    pgn.close()
     return fen_dict
 
 
 def main():
-    fen_dict = create_labels("Carlsen.pgn")
-    save_train_data(fen_dict, "trainData")
+    fen_dict = create_labels('../Carlsen.pgn')
+
+
+if __name__ == '__main__':
+    main()

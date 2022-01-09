@@ -75,7 +75,27 @@ def getTrainDataSparseMatrix6(inputFilePath):
     return X_train, Y_train
 
 
-def get_model():
+def getTrainDataSparseMatrix6Classification(inputFilePath):
+    X_train = np.empty(shape=(0, 6, 8, 8))
+    Y_train = np.empty(shape=(0))
+    with open(inputFilePath, 'r') as file:
+        for line in file:
+            line_elems = line.split(":")
+            fen, evaluation = line_elems[0], line_elems[1]
+            if "#" in evaluation:
+                continue
+            X_train = np.append(X_train, np.array([fen_to_sparse_matrix6(fen)]), axis=0)
+            if int(evaluation) < -100:
+                Y_train = np.append(Y_train, np.array([1]), axis=0)
+            elif -100 < int(evaluation) < 100:
+                Y_train = np.append(Y_train, np.array([2]), axis=0)
+            else:
+                Y_train = np.append(Y_train, np.array([3]), axis=0)
+
+    return X_train, Y_train
+
+
+def get_model_regression():
     model = tf.keras.models.Sequential([
         # tf.keras.layers.Input(shape=(8, 8, 1)),
         tf.keras.layers.Input(shape=(6, 8, 8)),
@@ -101,13 +121,39 @@ def get_model():
     return model
 
 
+def get_model_classification():
+    model = tf.keras.models.Sequential([
+        # tf.keras.layers.Input(shape=(8, 8, 1)),
+        tf.keras.layers.Input(shape=(6, 8, 8)),
+        tf.keras.layers.Conv2D(filters=8, kernel_size=3, padding='same', kernel_initializer='he_uniform',
+                               activation='relu'),
+        tf.keras.layers.Conv2D(filters=16, kernel_size=3, padding='same', kernel_initializer='he_uniform',
+                               activation='relu'),
+        tf.keras.layers.Conv2D(filters=32, kernel_size=3, padding='same', kernel_initializer='he_uniform',
+                               activation='relu'),
+        tf.keras.layers.Conv2D(filters=64, kernel_size=3, padding='same', kernel_initializer='he_uniform',
+                               activation='relu'),
+        tf.keras.layers.Conv2D(filters=128, kernel_size=3, padding='same', kernel_initializer='he_uniform',
+                               activation='relu'),
+        tf.keras.layers.Conv2D(filters=256, kernel_size=3, padding='same', kernel_initializer='he_uniform',
+                               activation='relu'),
+        tf.keras.layers.Flatten(),
+        tf.keras.layers.Dense(1024, activation='relu'),
+        tf.keras.layers.Dense(2048, activation='relu'),
+        tf.keras.layers.Dense(4096, activation='relu'),
+        tf.keras.layers.Dense(3, activation='softmax')
+    ])
+    model.compile(optimizer='adam', loss=tf.keras.losses.SparseCategoricalCrossentropy())
+    return model
+
+
 def get_loaded_model():
     model = tf.keras.models.load_model('models/conv_model')
     return model
 
 
 def main1():
-    model = get_model()
+    model = get_model_regression()
     X_train, Y_train = getTrainDataDenseMatrix("../trainData")
     X_train = np.expand_dims(X_train, axis=3)
     print(X_train.shape)
@@ -118,8 +164,8 @@ def main1():
 
 
 def main2():
-    model = get_model()
-    X_train, Y_train = getTrainDataSparseMatrix6("../trainData")
+    model = get_model_classification()
+    X_train, Y_train = getTrainDataSparseMatrix6Classification("../trainData")
     print(X_train.shape)
     print(Y_train.shape)
     cb = [tf.keras.callbacks.ModelCheckpoint('conv_model', save_best_only=True),
