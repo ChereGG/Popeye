@@ -80,6 +80,11 @@ def create_labels(pgn_folder):
         while True:
             game = chess.pgn.read_game(pgn)
             if game is None:
+                if i % 10 != 0:
+                    print("Saving...")
+                    save_train_data(fen_dict, '../trainData')
+                    save_checkpoint(idx, i)
+                    fen_dict.clear()
                 break
             if idx == idxGame and i <= idxPgn:
                 i += 1
@@ -96,8 +101,8 @@ def create_labels(pgn_folder):
                 save_checkpoint(idx, i)
                 fen_dict.clear()
             i += 1
-        engine.quit()
         pgn.close()
+    engine.quit()
 
 
 def main():
