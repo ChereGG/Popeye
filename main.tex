@@ -198,7 +198,7 @@ Differences between DeepMind's approach and ours:
                 \STATE XBatch $\leftarrow$ all X from batch b;
                 \STATE YBatch $\leftarrow$ all Y from batch b;
                 \STATE predictions $\leftarrow$ f(XBatch, $\theta$);
-                \STATE loss $\leftarrow$ MSE(predictions, YBatch);
+                \STATE loss $\leftarrow$ MSE/CE(predictions, YBatch);
                 \STATE update $\theta$ with the obtained loss using an optimer, e.g. Adam
             \ENDFOR
         \ENDFOR
