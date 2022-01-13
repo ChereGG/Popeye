@@ -24,6 +24,7 @@
 \usepackage{url}
 \usepackage{verbatim}
 \usepackage{xcolor}
+\usepackage{titlesec}
 
 \geometry{a4paper,top=3cm,left=2cm,right=2cm,bottom=3cm}
 
@@ -39,7 +40,7 @@
   \color{lime}\leaders\hrule height \headrulewidth\hfill}}
 \renewcommand{\footrule}{\hbox to\headwidth{%
   \color{lime}\leaders\hrule height \footrulewidth\hfill}}
-
+\renewcommand\bibname{References}
 \hypersetup{
 pdftitle={artTitle},
 pdfauthor={name},
@@ -161,18 +162,25 @@ Differences between DeepMind's approach and ours:
 
 \chapter{Approach}
 
-
-    As we have mentioned before, our goal is to create a decent evaluator for a given chess position rather than a model that is actually able to make a move. To do so, we firstly gathered some data which is comprised of several chess positions from Magnus Carlsen's (current world champion) live games which we encoded into FEN string representations that were then transposed into a tensor of dimensions 8x8x1.
-    \\*At first we created 3 different models to asses their performance. 
-    \\* \textbf{Model 1}
-    \\* A network with fully connected layers.
-    \\* \textbf{Model 2}
-    \\* A network with convolutional layers to which have been added some fully connected layers in order to provide additional computation in hope of achieving better performance.
-    \\* \textbf{Model 3}
-    \\* A RESNet(152 v2 architecture) to which we concatenated again some fully connected layers following the same reasoning as we did in case of the second model.
-    \\* For all the models mentioned above the training algorithm can be found in \textbf{Algorithm 1}.
+    \section{Regression vs Classification}
+    \textbf{Regression}: We first tried to mimic Stockfish's behaviour in terms of evaluating a position, therefore our models are supposed to predict a real value representing the exact evaluation of the current position.
+    \\*\textbf{Classification}: Due to the complexity of the regression problem we tried to simplify the task and express the regression problem as a multi-label classification one. Thus, the evaluation of the position (the label) was converted into 3 classes based on which color is supposed to have a better position \\*(0 = black is better, 1 = equal position, 2 = white is better). 
 
 
+    \section{Preprocessing}
+    
+    Our experiments have been conducted using three main tensor input representations, the first and the last one being inspired by \textbf{Matthia Sabatelli et al, 2018} \cite{paper1}.
+    \\*\textbf{Algebric representation} - An 8x8 matrix, each square having its piece value (scaled to [-1,1] ) or 0 if there is no piece on the square.
+    \\*\textbf{Sparse representation} - An 6x8x8 tensor representing an 8x8 matrix for every piece (Rook,Knight,Bishop,\\*Queen,King,Pawn), each square having a value of -1 (if there is a black piece on the square), 0 (if there is no piece on the square) or 1(if there is a white piece on the square).
+    \\*\textbf{Bitmap representation} - An 12x8x8 tensor representing an 8x8 matrix for every piece (Rook,Knight,Bishop,\\*Queen,King,Pawn) of each color (Black or White), each square having a value of 0 (if there is no piece on the square) or 1(if there is a piece of the corresponding color on the square).
+    \section{Models}
+    As we have mentioned before, our goal is to create a decent evaluator for a given chess position rather than a model that is actually able to make a move. \\*We selected a large dataset of chess games from numerous grandmasters. Each game is comprised of a particular sequence of moves(positions) that we labeled using one of the strongest chess engines at the moment (Stockfish). Every position is afterwards turned into a FEN string representation and saved to our train data file.
+    \\*Our experiments have been conducted using 2 main architectures based on exactly what has been proposed by \textbf{Matthia Sabatelli et al, 2018} \cite{paper1}: 
+    \\*\textbf{Model 1} A network with fully connected layers
+    that has an input layer of dimension width x height x channels for each tensor representation, 6 hidden layers( having 64,64,32,32,16,16 neurons), and one output layer with either 1 neuron for the regression task or 3 neurons for the classification one.
+    \\*\textbf{Model 2} An FCN (fully convolutional network) to which have been added some fully connected layers in order to provide additional computation in hope of achieving better performance. The architecture is similar to the VGG architecture and it's output layer is the same as the one in the first model. 
+
+\clearpage
 \begin{algorithm}
 	\caption{Training}
 	\label{BestMove}
@@ -230,5 +238,29 @@ Differences between DeepMind's approach and ours:
 \end{algorithmic}
 \end{algorithm}
 
+\chapter{Results}
+
+
+\begin{thebibliography}{3}
+
+\bibitem{paper1}
+Matthia Sabatelli, Francesco Bidoia, Valeriu Codreanu and Marco Wiering
+\\*Learning to Evaluate Chess Positions with Deep Neural Networks and Limited Lookahead
+
+\bibitem{paper2}
+David Silver, Thomas Hubert, Julian Schrittwieser, Ioannis Antonoglou, Matthew Lai, Arthur Guez, Marc Lanctot,
+Laurent Sifre, Dharshan Kumaran, Thore Graepel,
+Timothy Lillicrap, Karen Simonyan, Demis Hassabis
+\\*Mastering Chess and Shogi by Self-Play with a General Reinforcement Learning Algorithm
+
+\bibitem{paper3}
+Julian Schrittwieser, Ioannis Antonoglou, Thomas Hubert, 
+Karen Simonyan, Laurent Sifre, Simon Schmitt, Arthur Guez, 
+Edward Lockhart, Demis Hassabis, Thore Graepel, Timothy Lillicrap, 
+David Silver
+\\*Mastering Atari, Go, Chess and Shogi by Planning with a
+Learned Model
+
+\end{thebibliography}
 
 \end{document}

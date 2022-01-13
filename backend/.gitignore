@@ -6,11 +6,12 @@
 /out-tsc
 # Only exists if Bazel was run
 /bazel-out
-
+conv_model_logs/
 .env
 *.ipynb*
 *.pgn
 trainData
+conv_model_logs
 stockfish
 logs
 Pipfile
