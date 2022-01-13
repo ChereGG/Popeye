@@ -12,8 +12,6 @@ model = cm.get_loaded_model()
 def next_move(request):
     if request.method == 'POST':
         fen = request.data['fen']
-        print(fen)
-
         board = chess.Board(fen=fen)
         next_moves = board.legal_moves
         max_eval, best_move = None, None
@@ -21,7 +19,7 @@ def next_move(request):
             board.push(move)
             fen = board.fen()
             color = board.turn
-            matrix = fp.fen_to_matrix(fen)
+            matrix = fp.fen_to_sparse_matrix6(fen)
             evalutaion = model.predict([matrix])[0]
             if max_eval is None:
                 max_eval = evalutaion
