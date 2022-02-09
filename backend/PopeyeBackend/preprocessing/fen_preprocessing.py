@@ -2,6 +2,7 @@ import chess
 import chess.engine
 import chess.pgn
 import os
+from decouple import config
 
 
 def fen_to_matrix(fen):
@@ -49,31 +50,33 @@ def fen_to_sparse_matrix6(fen):
             piece_map["B"], piece_map["K"], piece_map["Q"]]
 
 
-def save_train_data(fen_dict, filePath):
-    with open(filePath, 'a') as file:
+def save_train_data(fen_dict, batchPath):
+    with open(batchPath + "/trainData", 'a') as file:
         for fen in fen_dict:
             file.write(str(fen) + ":" + str(fen_dict[fen]) + "\n")
 
 
-def save_checkpoint(idxPgn, idxGame):
-    with open("../games/checkpoint.txt", "w") as file:
+def save_checkpoint(batchPath, idxPgn, idxGame):
+    with open(batchPath + "/checkpoint.txt", "w") as file:
         file.write(str(idxPgn) + ":" + str(idxGame))
 
 
-def readCheckpoint():
-    with open("../games/checkpoint.txt", "r") as file:
+def readCheckpoint(batchPath):
+    with open(batchPath + "/checkpoint.txt", "r") as file:
         idxGame, idxCheckpont = file.read().strip().split(":")
     return int(idxGame), int(idxCheckpont)
 
 
-def create_labels(pgn_folder):
-    idxGame, idxPgn = readCheckpoint()
+def create_labels(batchPath):
+    
+    
+    idxGame, idxPgn = readCheckpoint(batchPath)
 
     engine = chess.engine.SimpleEngine.popen_uci("../../stockfish/stockfish.exe")
-    for idx, pgn_file in enumerate(os.listdir(pgn_folder)):
+    for idx, pgn_file in enumerate(os.listdir(batchPath)):
         if ".txt" in pgn_file or idx < idxGame:
             continue
-        pgn_file = pgn_folder + "/" + pgn_file
+        pgn_file = batchPath + "/" + pgn_file
         pgn = open(pgn_file)
         fen_dict = dict()
         i = 1
@@ -82,8 +85,8 @@ def create_labels(pgn_folder):
             if game is None:
                 if i % 10 != 0:
                     print("Saving...")
-                    save_train_data(fen_dict, '../trainData')
-                    save_checkpoint(idx, i)
+                    save_train_data(fen_dict, batchPath)
+                    save_checkpoint(batchPath,idx, i)
                     fen_dict.clear()
                 break
             if idx == idxGame and i <= idxPgn:
@@ -97,8 +100,8 @@ def create_labels(pgn_folder):
             print("Game: " + str(i) + " from " + pgn_file.split("/")[-1] + " ended!")
             if i % 10 == 0:
                 print("Saving...")
-                save_train_data(fen_dict, '../trainData')
-                save_checkpoint(idx, i)
+                save_train_data(fen_dict, batchPath)
+                save_checkpoint(batchPath,idx, i)
                 fen_dict.clear()
             i += 1
         pgn.close()
@@ -106,7 +109,9 @@ def create_labels(pgn_folder):
 
 
 def main():
-    create_labels("../games/")
+    
+    BATCH_PATH = config("PATH_TO_CURRENT_BATCH")
+    create_labels(BATCH_PATH)
 
 
 if __name__ == '__main__':
