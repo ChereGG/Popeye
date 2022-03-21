@@ -3,6 +3,7 @@ from decouple import config
 from tqdm import tqdm
 from generator import DataGenerator
 from preprocessing import fen_preprocessing as fp
+from models import vit
 
 
 def get_conv_model_regression():
@@ -109,9 +110,10 @@ if __name__=="__main__":
     BATCH_SIZE = int(config("BATCH_SIZE"))
     trainGen = DataGenerator("theData", BATCH_SIZE, (8, 8, 12), (1,))
     valGen = DataGenerator("theData", BATCH_SIZE, (8, 8, 12), (1,), train=False)
-    model=get_conv_model_classification()
+    # model=get_conv_model_classification()
+    model=vit.create_vit_classifier()
     EPOCHS = int(config("EPOCHS"))
     callbacks = [
-        tf.keras.callbacks.TensorBoard(log_dir='./logsConvModel'),
+        # tf.keras.callbacks.TensorBoard(log_dir='./logsConvModel'),
     ]
     model.fit(trainGen,validation_data=valGen,epochs=EPOCHS, callbacks=callbacks)
