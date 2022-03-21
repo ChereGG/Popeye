@@ -47,13 +47,13 @@ class PatchEncoder(layers.Layer):
 
 def create_vit_classifier(
         num_classes=3,
-        input_shape=(8, 8, 12),
+        input_shape=(8, 8, 13),
         learning_rate=0.001,
         weight_decay=0.0001,
         patch_size=2,  # Size of the patches to be extract from the input images
-        projection_dim=64,
+        projection_dim=16,
         num_heads=4,
-        transformer_layers=8,
+        transformer_layers=16,
         mlp_head_units=[2048, 1024],  # Size of the dense layers of the final classifier
 ):
     num_patches = (input_shape[0] // patch_size) ** 2
@@ -103,4 +103,5 @@ def create_vit_classifier(
         metrics=["accuracy"],
         run_eagerly=True
     )
+    model.summary()
     return model

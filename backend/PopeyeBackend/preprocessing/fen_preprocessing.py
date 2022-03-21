@@ -68,6 +68,7 @@ def fen_to_sparse_matrix12(fen):
     }
     records = fen.split()
     board = records[0]
+    who_moves=records[1]
     position_rows = board.split("/")
     contor = 0
     for position_row in position_rows:
@@ -77,7 +78,8 @@ def fen_to_sparse_matrix12(fen):
                 contor += 1
             else:
                 contor += int(potential_piece)
-    return [piece_map["P"], piece_map["R"], piece_map["N"],
+    color_to_move=np.zeros(shape=(8,8)) if who_moves == "b" else np.ones(shape=(8,8))
+    return [color_to_move, piece_map["P"], piece_map["R"], piece_map["N"],
             piece_map["B"], piece_map["K"], piece_map["Q"], piece_map["p"], piece_map["r"], piece_map["n"],
             piece_map["b"], piece_map["k"], piece_map["q"]]
 
