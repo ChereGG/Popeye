@@ -15,9 +15,11 @@ theData
 games
 logs
 Pipfile
+models/reinforcement/
+models/supervised/
 # dependencies
 /node_modules
-models/conv_model
+models/supervised/conv_model
 .idea
 # profiling files
 chrome-profiler-events*.json

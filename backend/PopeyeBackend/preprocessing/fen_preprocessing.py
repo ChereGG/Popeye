@@ -78,6 +78,37 @@ def fen_to_sparse_matrix12(fen):
                 contor += 1
             else:
                 contor += int(potential_piece)
+    return [piece_map["P"], piece_map["R"], piece_map["N"],
+            piece_map["B"], piece_map["K"], piece_map["Q"], piece_map["p"], piece_map["r"], piece_map["n"],
+            piece_map["b"], piece_map["k"], piece_map["q"]]
+
+def fen_to_sparse_matrix13(fen):
+    piece_map = {
+        "P": [[0 for _ in range(8)] for _ in range(8)],
+        "R": [[0 for _ in range(8)] for _ in range(8)],
+        "N": [[0 for _ in range(8)] for _ in range(8)],
+        "B": [[0 for _ in range(8)] for _ in range(8)],
+        "K": [[0 for _ in range(8)] for _ in range(8)],
+        "Q": [[0 for _ in range(8)] for _ in range(8)],
+        "p": [[0 for _ in range(8)] for _ in range(8)],
+        "r": [[0 for _ in range(8)] for _ in range(8)],
+        "n": [[0 for _ in range(8)] for _ in range(8)],
+        "b": [[0 for _ in range(8)] for _ in range(8)],
+        "k": [[0 for _ in range(8)] for _ in range(8)],
+        "q": [[0 for _ in range(8)] for _ in range(8)],
+    }
+    records = fen.split()
+    board = records[0]
+    who_moves=records[1]
+    position_rows = board.split("/")
+    contor = 0
+    for position_row in position_rows:
+        for potential_piece in position_row:
+            if potential_piece.isalpha():
+                piece_map[potential_piece][int(contor / 8)][contor % 8] = 1
+                contor += 1
+            else:
+                contor += int(potential_piece)
     color_to_move=np.zeros(shape=(8,8)) if who_moves == "b" else np.ones(shape=(8,8))
     return [color_to_move, piece_map["P"], piece_map["R"], piece_map["N"],
             piece_map["B"], piece_map["K"], piece_map["Q"], piece_map["p"], piece_map["r"], piece_map["n"],

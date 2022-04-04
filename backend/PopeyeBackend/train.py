@@ -1,9 +1,8 @@
 import tensorflow as tf
 from decouple import config
-from tqdm import tqdm
 from generator import DataGenerator
-from preprocessing import fen_preprocessing as fp
-from models import vit, dense_classifier, conv_classifier
+from models.supervised import vit
+
 
 def get_loaded_model():
     model = tf.keras.models.load_model('models/conv_model')
@@ -20,7 +19,7 @@ if __name__=="__main__":
     trainGen = DataGenerator("theData", BATCH_SIZE, (8, 8, 13), (1,))
     valGen = DataGenerator("theData", BATCH_SIZE, (8, 8, 13), (1,), train=False)
     # model=conv_classifier.get_conv_model_classification()
-    model=vit.create_vit_classifier()
+    model= vit.create_vit_classifier()
     EPOCHS = int(config("EPOCHS"))
     callbacks = [
         # tf.keras.callbacks.TensorBoard(log_dir='./logsConvModel'),
