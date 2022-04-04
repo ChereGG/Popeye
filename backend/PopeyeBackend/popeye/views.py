@@ -8,26 +8,32 @@ import chess
 import tensorflow as tf
 from decouple import config
 import numpy as np
+import json
 
+tf.config.set_visible_devices([], 'GPU')
 model = None
 env = None
 
 if config("DQN-AGENT") == "True":
-    model = tf.keras.models.load_model("./models/reinforcement/dqn-agent-masked-moves/")
+    model = tf.keras.models.load_model("./models/reinforcement/dqn-agent-masked-moves-resnet-alpha0/model")
     env = gym.make('ChessAlphaZero-v0')
-    env.reset()
 else:
     model = tf.keras.models.load_model("./models/supervised/conv_model/")
 
 
 @api_view(['POST'])
-def next_move(request):
+def send_move(request):
     if request.method == 'POST':
         if config("DQN-AGENT") == "True":
-            fen = request.data['fen']
-            encoded_board = np.transpose(fp.fen_to_sparse_matrix13(fen))
-            encoded_board = np.expand_dims(encoded_board, axis=0)
-            output = model(encoded_board, training=False)[0]
+            body = json.loads(request.body.decode("utf-8"))
+            move = body["move"]
+            step = None
+            if move == "start":
+                step = env.reset()
+            elif move != "start":
+                step, _, _, _, = env.step(env.encode(chess.Move.from_uci(move)))
+            step = np.expand_dims(step, axis=0)
+            output = model(step, training=False)[0]
             all_moves = np.array(list(range(output.shape[0])))
             all_legal_moves = env.legal_actions
             illegal_moves = [move for move in all_moves if move not in all_legal_moves]
@@ -60,11 +66,3 @@ def next_move(request):
                 board.pop()
 
             return JsonResponse({'move': str(best_move)}, status=status.HTTP_200_OK)
-
-@api_view(['POST'])
-def send_move(request):
-    if request.method == 'POST':
-        move = request.data['move']
-        move = chess.Move.from_uci(move)
-        env.step(env.encode(move))
-        return JsonResponse({'message': 'Ok!'}, status=status.HTTP_200_OK)

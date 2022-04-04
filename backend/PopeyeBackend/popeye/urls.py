@@ -5,6 +5,5 @@ from popeye import views
 from PopeyeBackend import settings
 
 urlpatterns = [
-    path('api/next-move', views.next_move),
     path('api/send-move', views.send_move),
 ]

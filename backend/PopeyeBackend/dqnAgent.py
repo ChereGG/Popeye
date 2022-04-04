@@ -24,35 +24,40 @@ env = CustomEnvironment(mask_moves=mask_moves)
 num_actions = env.action_space.n
 
 
-def create_q_model():
+def create_q_model_dense():
     initializer = tf.keras.initializers.HeUniform()
-    inputs = layers.Input(shape=env.observation_shape)
-    flatten = layers.Flatten()(inputs)
-    layer1 = layers.Dense(64, activation="relu",kernel_initializer=initializer)(flatten)
-    layer2 = layers.Dense(64, activation="relu",kernel_initializer=initializer)(layer1)
-    layer3 = layers.Dense(64, activation="relu",kernel_initializer=initializer)(layer2)
-    layer4 = layers.Dense(64, activation="relu",kernel_initializer=initializer)(layer3)
+    input_tensor = layers.Input(shape=env.observation_shape)
+    flatten = layers.Flatten()(input_tensor)
+    layer1 = layers.Dense(64, activation="relu", kernel_initializer=initializer)(flatten)
+    layer2 = layers.Dense(64, activation="relu", kernel_initializer=initializer)(layer1)
+    layer3 = layers.Dense(64, activation="relu", kernel_initializer=initializer)(layer2)
+    layer4 = layers.Dense(64, activation="relu", kernel_initializer=initializer)(layer3)
     output = layers.Dense(num_actions, activation="linear")(layer4)
 
-    return keras.Model(inputs=inputs, outputs=output)
+    return keras.Model(inputs=input_tensor, outputs=output)
 
 
-# The first model makes the predictions for Q-values which are used to
-# make a action.
-if mask_moves:
-    if os.path.isdir("./dqn-agent-masked-moves"):
-        model = tf.keras.models.load_model("./dqn-agent-masked-moves")
-        model_target = tf.keras.models.load_model("./dqn-agent-masked-moves")
-    else:
-        model = create_q_model()
-        model_target = create_q_model()
+def create_q_model_resnet50V2():
+    input_tensor = layers.Input(shape=env.observation_shape)
+    resnet = tf.keras.applications.ResNet50V2(
+        include_top=True,
+        weights=None,
+        input_tensor=input_tensor,
+        input_shape=None,
+        pooling=None,
+        classes=env.action_space.n,
+        classifier_activation="linear",
+    )
+    return resnet
+
+file_writer = tf.summary.create_file_writer(config("model_path") + "logs/")
+
+if config("use_resnet")=="True":
+    model = create_q_model_resnet50V2()
+    model_target = create_q_model_resnet50V2()
 else:
-    if os.path.isdir("./dqn-agent/"):
-        model = tf.keras.models.load_model('./dqn-agent/')
-        model_target = tf.keras.models.load_model('./dqn-agent/')
-    else:
-        model = create_q_model()
-        model_target = create_q_model()
+    model = create_q_model_dense()
+    model_target = create_q_model_dense()
 
 optimizer = keras.optimizers.Adam(learning_rate=float(config("learning_rate")))
 
@@ -78,7 +83,7 @@ update_target_network = 10
 loss_function = keras.losses.Huber()
 max_reward = None
 
-while True:  # Run until solved
+for i in range(int(config("num_of_episodes"))):
     state = np.array(env.reset())
     episode_reward = 0
     white_to_move = True
@@ -103,7 +108,8 @@ while True:  # Run until solved
                     action_probs = model(state_tensor, training=False)[0]
                     ilegal_indices = env.get_ilegal_moves()
                     ilegal_indices = np.expand_dims(ilegal_indices, axis=-1)
-                    action_probs = tf.tensor_scatter_nd_update(action_probs,ilegal_indices,[np.NINF]*len(ilegal_indices))
+                    action_probs = tf.tensor_scatter_nd_update(action_probs, ilegal_indices,
+                                                               [np.NINF] * len(ilegal_indices))
                     action = tf.argmax(action_probs).numpy()
                 else:
                     state_tensor = tf.convert_to_tensor(state)
@@ -183,30 +189,15 @@ while True:  # Run until solved
                 del action_history[:1]
                 del done_history[:1]
 
-            # Log details
-            template = "episode_reward: {:.2f} at episode {}, frame count {}, epsilon {}"
-            print(template.format(episode_reward, episode_count, frame_count, epsilon))
             white_to_move = False
 
             if done:
-                if max_reward is None:
-                    max_reward = episode_reward
-                    if mask_moves:
-                        model.save("./dqn-agent-masked-moves")
-                    else:
-                        model.save("./dqn-agent")
-                elif episode_reward > max_reward:
-                    max_reward = episode_reward
-                    if mask_moves:
-                        model.save("./dqn-agent-masked-moves")
-                    else:
-                        model.save("./dqn-agent")
                 break
 
         else:
             action = np.random.choice(env.get_legal_moves())
             state_next, reward, done, _ = env.step(action)
-            white_to_move=True
+            white_to_move = True
             if done:
                 break
 
@@ -216,4 +207,23 @@ while True:  # Run until solved
         del episode_reward_history[:1]
     running_reward = np.mean(episode_reward_history)
 
+    # Log details
+    with file_writer.as_default():
+        tf.summary.scalar("reward", data=episode_reward, step=episode_count)
+
+    if max_reward is None:
+        max_reward = episode_reward
+        if mask_moves:
+            model.save(config("model_path") + "model")
+        else:
+            model.save("./dqn-agent")
+    elif episode_reward > max_reward:
+        max_reward = episode_reward
+        if mask_moves:
+            model.save(config("model_path") + "model")
+        else:
+            model.save("./dqn-agent")
+
+    template = "episode_reward: {:.2f} at episode {}, frame count {}, epsilon {}"
+    print(template.format(episode_reward, episode_count, frame_count, epsilon))
     episode_count += 1

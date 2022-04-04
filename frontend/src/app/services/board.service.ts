@@ -12,11 +12,11 @@ export class BoardService {
     'Content-Type': 'application/json'
   });
 
-  getNextMove(fen:String) : Observable<any> {
+  sendMove(move:String) : Observable<any> {
     const body = JSON.stringify({
-      'fen':fen,
+      "move":move,
     });
-    return this.http.post(baseUrl + '/next-move',body,{headers:this.headers});
+    return this.http.post(baseUrl + '/send-move',body,{headers:this.headers});
   }
 
 }
