@@ -1,4 +1,4 @@
 <div>
-  <ngx-chess-board #board [size]="800" [showCoords]="true" (moveChange)="nextMove()"></ngx-chess-board>
+  <ngx-chess-board #board [size]="800" [showCoords]="true" (moveChange)="sendMove()"></ngx-chess-board>
   <button class="button-undo" (click)="undo()">Undo</button>
 </div>

@@ -5,5 +5,7 @@ from popeye import views
 from PopeyeBackend import settings
 
 urlpatterns = [
-    path('api/next-move', views.next_move),
+    path('api/send-move-reinforcement', views.send_move_reinforcement),
+    path('api/send-move-supervised', views.send_move_supervised),
+    path('api/undo-reinforcement', views.undo_reinforcement),
 ]
