@@ -2,6 +2,7 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {NgxChessBoardComponent, NgxChessBoardView} from 'ngx-chess-board';
 import {BoardService} from "../../services/board.service";
 import {HttpClient} from "@angular/common/http";
+import {Location} from '@angular/common';
 
 @Component({
   selector: 'app-chess-board',
@@ -11,35 +12,47 @@ import {HttpClient} from "@angular/common/http";
 export class ChessBoardComponent implements OnInit {
   @ViewChild(NgxChessBoardComponent) board: NgxChessBoardView;
 
-  private send:boolean=true;
+  private send: boolean = true;
+  private method: string;
 
 
-  public constructor(private boardService: BoardService) {
+  public constructor(private boardService: BoardService, private location: Location) {
 
   }
 
-   sendMove(): void {
-    if (this.send) {
-      const len = this.board.getMoveHistory().length;
-      if (len == 0) {
-        this.boardService.sendMove("start").subscribe(response => {
+  sendMove(): void {
+    if (this.method === 'reinforcement') {
+      if (this.send) {
+        const len = this.board.getMoveHistory().length;
+        if (len == 0) {
+          this.boardService.sendMoveReinforcement("start").subscribe(response => {
+            this.send = false;
+            this.board.move(response["move"]);
+            this.send = true;
+          })
+        } else {
+          const move = this.board.getMoveHistory()[this.board.getMoveHistory().length - 1];
+          this.boardService.sendMoveReinforcement(move["move"]).subscribe(response => {
+            this.send = false;
+            this.board.move(response["move"]);
+            this.send = true;
+          })
+        }
+      }
+    } else {
+      if (this.send) {
+        this.boardService.sendMoveSupervised(this.board.getFEN()).subscribe(response => {
           this.send = false;
           this.board.move(response["move"]);
           this.send = true;
-        })
-      } else {
-        const move = this.board.getMoveHistory()[this.board.getMoveHistory().length - 1];
-        this.boardService.sendMove(move["move"]).subscribe(response => {
-          this.send = false;
-          this.board.move(response["move"]);
-          this.send = true;
-        })
+        });
       }
     }
   }
 
   ngOnInit(): void {
 
+    this.method = this.location.getState()['method'];
   }
 
   ngAfterViewInit(): void {
@@ -48,5 +61,12 @@ export class ChessBoardComponent implements OnInit {
 
   undo(): void {
     this.board.undo();
+    if (this.method === 'reinforcement') {
+      this.boardService.sendUndoReinforcement(this.board.getMoveHistory()).subscribe(response => {
+        this.send = false;
+        this.board.move(response["move"]);
+        this.send = true;
+      });
+    }
   }
 }
