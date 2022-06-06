@@ -24,10 +24,8 @@ def get_conv_model_classification():
         tf.keras.layers.Conv2D(filters=256, kernel_size=3, padding='same', kernel_initializer='he_uniform',
                                activation='relu'),
         tf.keras.layers.Flatten(),
-        tf.keras.layers.Dense(4096, activation='relu'),
-        tf.keras.layers.Dense(4096, activation='relu'),
         tf.keras.layers.Dense(2048, activation='relu'),
-        tf.keras.layers.Dense(2048, activation='relu'),
+        tf.keras.layers.Dense(1024, activation='relu'),
         tf.keras.layers.Dense(3, activation='softmax'),
     ])
     model.compile(optimizer='adam', loss=tf.keras.losses.SparseCategoricalCrossentropy(), metrics=['accuracy'], run_eagerly=True)
