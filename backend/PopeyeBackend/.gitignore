@@ -15,8 +15,8 @@ theData
 games
 logs
 Pipfile
-models/reinforcement/
-models/supervised/
+models/reinforcement/saved-models
+models/supervised/saved-models
 # dependencies
 /node_modules
 models/supervised/conv_model
