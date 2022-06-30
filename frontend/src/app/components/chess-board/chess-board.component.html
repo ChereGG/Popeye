@@ -1,4 +1,6 @@
 <div>
+  <h2 class="label">Folosiți engine-ul bazat pe metoda: {{this.method}}</h2>
   <ngx-chess-board #board [size]="800" [showCoords]="true" (moveChange)="sendMove()"></ngx-chess-board>
-  <button class="button-undo" (click)="undo()">Undo</button>
+  <button class="button-choice" (click)="undo()">Undo</button>
+  <button class="button-choice" (click)="back()">Back</button>
 </div>

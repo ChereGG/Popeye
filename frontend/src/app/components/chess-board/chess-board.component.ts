@@ -3,6 +3,7 @@ import {NgxChessBoardComponent, NgxChessBoardView} from 'ngx-chess-board';
 import {BoardService} from "../../services/board.service";
 import {HttpClient} from "@angular/common/http";
 import {Location} from '@angular/common';
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-chess-board',
@@ -13,10 +14,10 @@ export class ChessBoardComponent implements OnInit {
   @ViewChild(NgxChessBoardComponent) board: NgxChessBoardView;
 
   private send: boolean = true;
-  private method: string;
+  public method: string;
 
 
-  public constructor(private boardService: BoardService, private location: Location) {
+  public constructor(private boardService: BoardService, private location: Location,private router:Router) {
 
   }
 
@@ -68,5 +69,9 @@ export class ChessBoardComponent implements OnInit {
         this.send = true;
       });
     }
+  }
+
+  back() {
+    this.router.navigate(['/'])
   }
 }

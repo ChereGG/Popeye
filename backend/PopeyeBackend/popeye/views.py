@@ -11,10 +11,10 @@ import json
 from models.supervised.auto_encoder import AutoEncoderAccuracy
 tf.config.set_visible_devices([], 'GPU')
 
-model_reinforcement = tf.keras.models.load_model("./models/reinforcement/dqn-agent-masked-moves-resnet-alpha0/model")
+model_reinforcement = tf.keras.models.load_model("./models/reinforcement/saved-models/dqn-agent-masked-moves-resnet-alpha0/model")
 env = gym.make('ChessAlphaZero-v0')
-model_superised = tf.keras.models.load_model("./models/supervised/conv_model_classificator/")
-auto_enc = tf.keras.models.load_model("./models/supervised/auto_encoder_unet_model_8/",custom_objects={"AutoEncoderAccuracy": AutoEncoderAccuracy})
+model_superised = tf.keras.models.load_model("./models/supervised/saved-models/conv_model_classificator/")
+auto_enc = tf.keras.models.load_model("./models/supervised/saved-models/auto_encoder_unet_model_8/",custom_objects={"AutoEncoderAccuracy": AutoEncoderAccuracy})
 encoder = auto_enc.layers[:10]
 encoder = tf.keras.models.Sequential(encoder)
 

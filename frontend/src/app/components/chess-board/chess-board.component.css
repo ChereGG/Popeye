@@ -4,10 +4,27 @@ div{
   display: inline-flex;
 }
 
-.button-undo{
-  height: 40px;
-  width: 80px;
-  margin-left: 100px;
-  margin-top: 350px;
-  cursor: pointer;
+.button-choice {
+  width: 200px;
+  border-radius: 5px;
+  border: 1px solid #5f41d0;
+  color: #fff;
+  margin-left: 10px;
+  height: 50px;
+  background-color: #5f41d0;
+}
+
+.button-choice:hover{
+ background-color: #4622b3;
+  -webkit-transform: translateY(-1px);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  cursor: crosshair;
+}
+
+.label{
+  display: block;
+  margin-left: -25%;
+  margin-right: 1%;
+  margin-top: 20%;
 }
